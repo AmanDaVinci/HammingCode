@@ -4,8 +4,9 @@
 #include <math.h>
 
 char* getHamming(char* message);
-char* asciiToBinary(int input);
+char parity(char* msg, int index);
 char* getBinaryMsg(char* msg);
+char* asciiToBinary(int input);
 
 int main(int argc, char** argv)
 {
@@ -49,11 +50,44 @@ int main(int argc, char** argv)
 
 char* getHamming(char* message)
 {
-    char* hammingCode;
-    
     char* msgStream = getBinaryMsg(message);
+
+    // Counting parity bits
+    int msglen = strlen(msgStream);
+    int paritylen = 0;
+    for (int i = 1; i <= msglen; i=i*2)
+        paritylen++;
+
+    // Declaring the hamming code stream
+    int len = msglen + paritylen;
+    char* hammingCode = (char*)malloc(sizeof(char)*len+1);
+
+    // Filling up the hamming code
+    int i, j = 0;
+    for (i = 0; i < len; i++)
+    {
+        // Filling up parity positions
+        if( i==0 || (i!=1 && ((i & (i-1)) == 0)) ) // Bit hack to check if i is power of 2
+        {
+            printf("%i\n", i );
+            hammingCode[i]=parity(msgStream, i);
+        }
+        // Filling up the data
+        else
+        {
+            hammingCode[i] = msgStream[j];
+            j++;
+        }
+    }
     
-    return msgStream;
+    // Terminating the hamming code string
+    hammingCode[len] = '\0';
+    return hammingCode;
+}
+
+char parity(char* msg, int index)
+{
+    return '*';
 }
 
 char* getBinaryMsg(char* msg)

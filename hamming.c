@@ -7,9 +7,11 @@ char* getHamming(char* message);
 char parity(char* msg, int index);
 char* getBinaryMsg(char* msg);
 char* asciiToBinary(int input);
+int isPowerOfTwo(int n);
 
 int main(int argc, char** argv)
 {
+
     if(argc != 3)
     {
         printf("Usage: ./hamming -send/receive message\n");
@@ -50,7 +52,9 @@ int main(int argc, char** argv)
 
 char* getHamming(char* message)
 {
-    char* msgStream = getBinaryMsg(message);
+    //char* msgStream = getBinaryMsg(message);
+    char* msgStream = message;
+    printf("%s\n", msgStream);
 
     // Counting parity bits
     int msglen = strlen(msgStream);
@@ -61,17 +65,16 @@ char* getHamming(char* message)
     // Declaring the hamming code stream
     int len = msglen + paritylen;
     char* hammingCode = (char*)malloc(sizeof(char)*len+1);
-
-    // Filling up the hamming code
+    
+    // Filling up the hamming code    
     int i, j = 0;
-    for (i = 0; i < len; i++)
+    for (i = 0; i < len; ++i)
     {
-        // Filling up parity positions
-        if( i==0 || (i!=1 && ((i & (i-1)) == 0)) ) // Bit hack to check if i is power of 2
-        {
-            printf("%i\n", i );
-            hammingCode[i]=parity(msgStream, i);
-        }
+        // Positions of bits
+        int pos = i+1;
+   
+        if(isPowerOfTwo(pos))
+            hammingCode[i] = '*';
         // Filling up the data
         else
         {
@@ -82,12 +85,43 @@ char* getHamming(char* message)
     
     // Terminating the hamming code string
     hammingCode[len] = '\0';
+
+    printf("%s\n", hammingCode );
+    // Filling up parity positions
+    for (i = 0; i < len; i++)
+    {
+        // Positions of bits
+        int pos = i+1;
+
+        if(isPowerOfTwo(pos)) 
+        {
+            hammingCode[i]=parity(hammingCode, pos);
+            printf("parity %c\n", hammingCode[i] );
+        }
+        
+    }
+    
     return hammingCode;
 }
 
 char parity(char* msg, int index)
 {
-    return '*';
+    int len = strlen(msg);
+    int onesCount = 0;
+
+    printf("index: %d\n", index );
+
+    int i;
+    for (i = index; i < len; i = i+index+1)
+    {
+        if(msg[i-1]=='1')
+            onesCount++;
+    }
+    
+    if (onesCount%2 == 0)
+        return '0';
+    else
+        return '1'; 
 }
 
 char* getBinaryMsg(char* msg)
@@ -139,4 +173,17 @@ char* asciiToBinary(int input)
     }
 
     return ascii;
+}
+
+int isPowerOfTwo(int n)
+{
+  if (n == 0)
+    return 0;
+  while (n != 1)
+  {
+    if (n%2 != 0)
+      return 0;
+    n = n/2;
+  }
+  return 1;
 }

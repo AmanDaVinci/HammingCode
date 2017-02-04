@@ -15,6 +15,9 @@ Examples:
 
 	$ ./hamming.py -d
 
+Author: Aman Hussain
+Last Modified: 4th February, 2017
+E-mail: aman@amandavinci.me
 """
 
 import sys

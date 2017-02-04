@@ -80,7 +80,34 @@ def hamming_decode(code):
 	Returns:
 		Original Data if error can be corrected, null otherwise
 	"""
-	return "Not Implemented"
+
+	# Converting string to list
+	code = list(code)
+
+	# Getting the positions of incorrect parity bits
+	error_pos = check_parity(code) - 1
+
+	code[error_pos] = '1' if (code[error_pos] == '0') else '0'
+
+	return ''.join(code)
+
+def check_parity(code):
+
+	error_sum = 0
+
+	# Checking with the correct parity bits
+	for i in range(len(code)):
+
+		# Parity locations
+		if isPowerOf2(i+1):
+			parity = compute_parity(code, i+1)
+			
+			# Computed parity does not match
+			if parity != code[i]:
+				error_sum = error_sum + i+1
+
+	return error_sum
+
 
 def set_parity(bits):
 	"""Sets parity bits into the original data bits"""

@@ -1,4 +1,4 @@
-#! /home/aman/anaconda3/bin/python3
+#! /usr/bin/python3
 """ hamming.py
 
 Error correction and detection using Hamming Codes
@@ -13,10 +13,10 @@ Options:
 Examples:
 	$ ./hamming.py -e secretmessgage
 
-	$ ./hamming.py -d
+	$ ./hamming.py -d recievedmessage
 
 Author: Aman Hussain
-Last Modified: 4th February, 2017
+Last Modified: 28th March, 2017
 E-mail: aman@amandavinci.me
 """
 
@@ -85,14 +85,69 @@ def hamming_decode(code):
 	"""
 
 	# Converting string to list
-	code = list(code)
+	data=list(code)
+	data.reverse()
+	c,ch,j,r,error,h,parity_list,h_copy=0,0,0,0,0,[],[],[]
 
-	# Getting the positions of incorrect parity bits
-	error_pos = check_parity(code) - 1
+	for k in range(0,len(data)):
+		p=(2**c)
+		h.append(int(data[k]))
+		h_copy.append(data[k])
+		if(p==(k+1)):
+			c=c+1
+            
+	for parity in range(0,(len(h))):
+		ph=(2**ch)
+		if(ph==(parity+1)):
 
-	code[error_pos] = '1' if (code[error_pos] == '0') else '0'
+			startIndex=ph-1
+			i=startIndex
+			toXor=[]
 
-	return ''.join(code)
+			while(i<len(h)):
+				block=h[i:i+ph]
+				toXor.extend(block)
+				i+=2*ph
+
+			for z in range(1,len(toXor)):
+				h[startIndex]=h[startIndex]^toXor[z]
+			parity_list.append(h[parity])
+			ch+=1
+	parity_list.reverse()
+	error=sum(int(parity_list) * (2 ** i) for i, parity_list in enumerate(parity_list[::-1]))
+    
+	if((error)==0):
+		c,data_bits=0,[]
+		for k in range(0,len(data)):
+			p=2**c
+			if(p==(k+1)):
+				c=c+1
+			else:
+				data_bits.append(h[k])
+		data_bits.reverse()
+		print(int(''.join(map(str, data_bits))))
+
+	elif((error)>=len(h_copy)):
+		return -1
+
+	else:
+		print('Error is in',error,'bit')
+
+		if(h_copy[error-1]=='0'):
+			h_copy[error-1]='1'
+
+		elif(h_copy[error-1]=='1'):
+			h_copy[error-1]='0'
+		c,data_bits=0,[]
+		for k in range(0,len(data)):
+			p=2**c
+			if(p==(k+1)):
+				c=c+1
+			else:
+				data_bits.append(h[k])
+		data_bits.reverse()
+		print(int(''.join(map(str, data_bits))))
+
 
 def check_parity(code):
 
